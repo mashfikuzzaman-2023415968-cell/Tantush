@@ -29,7 +29,7 @@
     "server-only": "^0.0.1",
     "tailwindcss-radix": "^2.8.0",
     "webpack": "^5",
-    "motion": "^12.23.0"
+    "motion": "^14.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
