@@ -1,0 +1,139 @@
+# Rendered by the nginx image's envsubst entrypoint (SHOP_DOMAIN / API_DOMAIN).
+
+# Refuse requests that don't target our domains (stops host-header attacks
+# and bots scanning the raw IP).
+server {
+  listen 80 default_server;
+  listen 443 ssl default_server;
+  http2 on;
+  ssl_reject_handshake on;
+  return 444;
+}
+
+server {
+  listen 80;
+  server_name ${SHOP_DOMAIN} www.${SHOP_DOMAIN} ${API_DOMAIN};
+  location / { return 301 https://$host$request_uri; }
+}
+
+server {
+  listen 443 ssl;
+  http2 on;
+  server_name www.${SHOP_DOMAIN};
+  return 301 https://${SHOP_DOMAIN}$request_uri;
+}
+
+# ============================================================ storefront
+server {
+  listen 443 ssl;
+  http2 on;
+  server_name ${SHOP_DOMAIN};
+
+  limit_conn perip 40;
+  add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+  location ~ /\.(?!well-known) { deny all; }
+
+  # Immutable build assets: cache forever at nginx and Cloudflare
+  location /_next/static/ {
+    proxy_pass http://storefront;
+    proxy_cache static;
+    proxy_cache_valid 200 365d;
+    proxy_cache_use_stale error timeout updating;
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+    add_header X-Cache $upstream_cache_status always;
+    access_log off;
+  }
+
+  # Optimised product images
+  location /_next/image {
+    limit_req zone=pages burst=60 nodelay;
+    proxy_pass http://storefront;
+    proxy_cache images;
+    proxy_cache_key "$scheme$host$request_uri$http_accept";
+    proxy_cache_valid 200 7d;
+    proxy_cache_use_stale error timeout updating http_500 http_502 http_503;
+    proxy_cache_lock on;
+    add_header X-Cache $upstream_cache_status always;
+  }
+
+  location /brand/ {
+    proxy_pass http://storefront;
+    proxy_cache static;
+    proxy_cache_valid 200 30d;
+    add_header X-Cache $upstream_cache_status always;
+  }
+
+  # Server actions that place orders / log in are POSTs to page URLs
+  location ~ "^/[a-z]{2}/checkout" {
+    limit_req zone=checkout burst=10 nodelay;
+    include /etc/nginx/templates/proxy-storefront.inc;
+  }
+
+  location ~ "^/[a-z]{2}/account" {
+    limit_req zone=auth burst=15 nodelay;
+    include /etc/nginx/templates/proxy-storefront.inc;
+  }
+
+  location / {
+    limit_req zone=pages burst=40 nodelay;
+    include /etc/nginx/templates/proxy-storefront.inc;
+  }
+}
+
+# ============================================================ API + admin
+server {
+  listen 443 ssl;
+  http2 on;
+  server_name ${API_DOMAIN};
+
+  limit_conn perip 60;
+  add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+  add_header X-Content-Type-Options nosniff always;
+  add_header X-Frame-Options SAMEORIGIN always;
+  # no-store for personal data, including errors raised before the app's headers
+  add_header Cache-Control $api_no_store always;
+
+  location ~ /\.(?!well-known) { deny all; }
+
+  # Product photos (local file provider). Never execute anything from uploads.
+  location /static/ {
+    proxy_pass http://medusa_api;
+    proxy_cache images;
+    proxy_cache_valid 200 30d;
+    proxy_cache_use_stale error timeout updating;
+    add_header Cache-Control "public, max-age=2592000" always;
+    add_header Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox" always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Cache $upstream_cache_status always;
+  }
+
+  # No payment webhooks with cash on delivery (open when adding a gateway)
+  location ^~ /hooks/ { return 404; }
+
+  location ~ ^/auth/ {
+    limit_req zone=auth burst=10 nodelay;
+    include /etc/nginx/templates/proxy-api.inc;
+  }
+
+  location ~ ^/store/carts/[^/]+/complete {
+    limit_req zone=checkout burst=5 nodelay;
+    include /etc/nginx/templates/proxy-api.inc;
+  }
+
+  # Admin dashboard + admin API.
+  # Strongly recommended: protect with Cloudflare Access (Zero Trust, free)
+  # or uncomment the allow-list below.
+  location ~ ^/(app|admin)(/|$) {
+    # allow 203.0.113.10;   # shop's static IP
+    # deny all;
+    limit_req zone=admin burst=60 nodelay;
+    client_max_body_size 20m;   # product image uploads
+    include /etc/nginx/templates/proxy-api.inc;
+  }
+
+  location / {
+    limit_req zone=api burst=60 nodelay;
+    include /etc/nginx/templates/proxy-api.inc;
+  }
+}

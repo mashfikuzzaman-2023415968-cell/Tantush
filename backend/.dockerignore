@@ -1,0 +1,10 @@
+node_modules
+.medusa
+.env
+.env.*
+!.env.template
+npm-debug.log*
+.git
+integration-tests
+coverage
+*.md

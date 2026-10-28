@@ -1,0 +1,15 @@
+proxy_pass http://storefront;
+proxy_http_version 1.1;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-Proto https;
+proxy_set_header X-Forwarded-Host $host;
+proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection $connection_upgrade;
+proxy_next_upstream error timeout http_502 http_503;
+proxy_next_upstream_tries 2;
+proxy_connect_timeout 5s;
+proxy_read_timeout 60s;
+proxy_buffers 16 32k;
+proxy_buffer_size 64k;

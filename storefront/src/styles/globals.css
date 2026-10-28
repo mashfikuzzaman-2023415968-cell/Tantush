@@ -1,0 +1,303 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* ------------------------------------------------------------------ *
+ * Tantush theme
+ * Medusa UI components read these variables, so remapping them here
+ * brings every starter component (forms, buttons, account pages) into
+ * the brand palette without forking each one.
+ * ------------------------------------------------------------------ */
+@layer base {
+  :root,
+  .light,
+  [data-mode="light"] {
+    --tantush-ivory: #f6f1ea;
+    --tantush-parchment: #ede6de;
+    --tantush-sand: #e2dcce;
+    --tantush-espresso: #3b2a14;
+    --tantush-cocoa: #4f302b;
+    --tantush-tan: #a18165;
+    --tantush-ink: #1f1a15;
+
+    --bg-base: #fbf8f4;
+    --bg-base-hover: #f3ece3;
+    --bg-base-pressed: #ede6de;
+    --bg-subtle: #f6f1ea;
+    --bg-subtle-hover: #efe8df;
+    --bg-subtle-pressed: #e8e0d5;
+    --bg-component: #f3ece3;
+    --bg-component-hover: #ede6de;
+    --bg-component-pressed: #e2dcce;
+    --bg-field: #fbf8f4;
+    --bg-field-hover: #f6f1ea;
+    --bg-field-component: #fffdfa;
+    --bg-field-component-hover: #f6f1ea;
+    --bg-highlight: #f1e7da;
+    --bg-highlight-hover: #eadcca;
+    --bg-interactive: #3b2a14;
+
+    --fg-base: #2a1f12;
+    --fg-subtle: #5f5246;
+    --fg-muted: #8b7d70;
+    --fg-disabled: #b8ab9d;
+    --fg-interactive: #6b4a35;
+    --fg-interactive-hover: #3b2a14;
+    --fg-on-inverted: #f6f1ea;
+    --fg-on-color: #f6f1ea;
+
+    --border-base: #e4dbcf;
+    --border-strong: #d4c5b1;
+    --border-interactive: #6b4a35;
+    --borders-interactive-with-active: 0px 0px 0px 1px #6b4a35, 0px 0px 0px 4px rgba(161, 129, 101, 0.25);
+    --borders-focus: 0px 0px 0px 1px #fbf8f4, 0px 0px 0px 3px rgba(107, 74, 53, 0.6);
+    --borders-interactive-with-focus: 0px 1px 2px 0px rgba(59, 42, 20, 0.12), 0px 0px 0px 1px #6b4a35, 0px 0px 0px 2px #fbf8f4, 0px 0px 0px 4px rgba(107, 74, 53, 0.6);
+
+    --button-inverted: #3b2a14;
+    --button-inverted-hover: #4f3a20;
+    --button-inverted-pressed: #24190b;
+    --button-neutral: #fbf8f4;
+    --button-neutral-hover: #f3ece3;
+    --button-neutral-pressed: #ede6de;
+
+    --contrast-bg-base: #3b2a14;
+    --contrast-fg-primary: #f6f1ea;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ivory-50 text-ink antialiased;
+    font-feature-settings: "kern", "liga";
+  }
+
+  /* Bangla script benefits from a touch more line height */
+  html[lang="bn"] body {
+    line-height: 1.7;
+  }
+
+  ::selection {
+    background: #3b2a14;
+    color: #f6f1ea;
+  }
+
+  :focus-visible {
+    outline: 2px solid #6b4a35;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  input:focus ~ label,
+  input:not(:placeholder-shown) ~ label {
+    @apply -translate-y-2 text-xsmall-regular;
+  }
+
+  input:focus ~ label {
+    @apply left-0;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    border: 1px solid #d4c5b1;
+    -webkit-text-fill-color: #2a1f12;
+    -webkit-box-shadow: 0 0 0px 1000px #fffdfa inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-results-button,
+  input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+  }
+
+  /* Subtle woven-paper grain used on hero / story sections */
+  .grain {
+    position: relative;
+    isolation: isolate;
+  }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.23  0 0 0 0 0.16  0 0 0 0 0.08  0 0 0 0.09 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .mask-fade-x {
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+}
+
+@layer components {
+  .content-container {
+    @apply max-w-[1440px] w-full mx-auto px-5 small:px-10;
+  }
+
+  .eyebrow {
+    @apply uppercase tracking-[0.28em] text-[11px] font-medium text-tan-600;
+  }
+
+  html[lang="bn"] .eyebrow {
+    @apply tracking-normal text-[13px] normal-case;
+  }
+
+  .heading-xl {
+    @apply font-display text-[2.6rem] leading-[1.05] small:text-[4.2rem] font-medium text-espresso tracking-[-0.01em];
+  }
+
+  .heading-lg {
+    @apply font-display text-[2rem] leading-[1.1] small:text-[3rem] font-medium text-espresso;
+  }
+
+  .heading-md {
+    @apply font-display text-[1.6rem] leading-tight small:text-[2rem] font-medium text-espresso;
+  }
+
+  .btn {
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-7 h-12 text-sm font-medium tracking-wide transition-all duration-300 ease-silk disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply btn bg-espresso text-ivory hover:bg-cocoa hover:shadow-[0_10px_30px_-10px_rgba(59,42,20,0.6)] active:scale-[0.98];
+  }
+
+  .btn-outline {
+    @apply btn border border-espresso/30 text-espresso hover:border-espresso hover:bg-espresso hover:text-ivory active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply btn text-espresso hover:bg-ivory-200;
+  }
+
+  .link-underline {
+    @apply relative after:absolute after:left-0 after:-bottom-0.5 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-500 after:ease-silk hover:after:origin-left hover:after:scale-x-100;
+  }
+
+  .chip {
+    @apply inline-flex items-center justify-center min-w-[3rem] h-11 px-4 rounded-full border border-ivory-400 text-sm text-espresso transition-all duration-200 ease-silk hover:border-espresso;
+  }
+
+  .chip[data-active="true"] {
+    @apply bg-espresso text-ivory border-espresso;
+  }
+
+  .chip[data-disabled="true"] {
+    @apply opacity-40 line-through pointer-events-none;
+  }
+
+  .card-surface {
+    @apply rounded-2xl bg-white/70 backdrop-blur-sm border border-ivory-300 shadow-[0_1px_2px_rgba(59,42,20,0.04),0_8px_24px_-12px_rgba(59,42,20,0.12)];
+  }
+
+  .skeleton {
+    @apply bg-[linear-gradient(90deg,#efe8df_0%,#f8f3ec_50%,#efe8df_100%)] bg-[length:200%_100%] animate-shimmer;
+  }
+
+  .text-xsmall-regular {
+    @apply text-[10px] leading-4 font-normal;
+  }
+
+  .text-small-regular {
+    @apply text-xs leading-5 font-normal;
+  }
+
+  .text-small-semi {
+    @apply text-xs leading-5 font-semibold;
+  }
+
+  .text-base-regular {
+    @apply text-sm leading-6 font-normal;
+  }
+
+  .text-base-semi {
+    @apply text-sm leading-6 font-semibold;
+  }
+
+  .text-large-regular {
+    @apply text-base leading-6 font-normal;
+  }
+
+  .text-large-semi {
+    @apply text-base leading-6 font-semibold;
+  }
+
+  .text-xl-regular {
+    @apply text-2xl leading-[36px] font-normal;
+  }
+
+  .text-xl-semi {
+    @apply text-2xl leading-[36px] font-semibold;
+  }
+
+  .text-2xl-regular {
+    @apply text-[30px] leading-[48px] font-normal;
+  }
+
+  .text-2xl-semi {
+    @apply text-[30px] leading-[48px] font-semibold;
+  }
+
+  .text-3xl-regular {
+    @apply font-display text-[32px] leading-[44px] font-medium text-espresso;
+  }
+
+  .text-3xl-semi {
+    @apply font-display text-[32px] leading-[44px] font-semibold text-espresso;
+  }
+}
+
+/* Dual-handle price slider thumbs */
+@layer components {
+  .range-thumb::-webkit-slider-thumb {
+    @apply pointer-events-auto h-5 w-5 cursor-grab appearance-none rounded-full border-2 border-espresso bg-ivory-50 shadow transition-transform active:scale-110 active:cursor-grabbing;
+  }
+  .range-thumb::-moz-range-thumb {
+    @apply pointer-events-auto h-5 w-5 cursor-grab rounded-full border-2 border-espresso bg-ivory-50 shadow;
+  }
+}

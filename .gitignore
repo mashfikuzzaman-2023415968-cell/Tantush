@@ -1,0 +1,6 @@
+.env
+backups/
+infra/nginx/certs/*
+!infra/nginx/certs/.gitkeep
+node_modules
+.DS_Store
