@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 # ---------------------------------------------------------------- build stage
-FROM node:22-bookworm-slim AS build
+FROM node:25-bookworm-slim AS build
 WORKDIR /app
 ENV NODE_ENV=development
 COPY package.json package-lock.json ./
@@ -13,7 +13,7 @@ RUN npx medusa build \
  && npm cache clean --force
 
 # -------------------------------------------------------------- runtime stage
-FROM node:22-bookworm-slim AS runtime
+FROM node:25-bookworm-slim AS runtime
 ENV NODE_ENV=production \
     MEDUSA_DISABLE_TELEMETRY=true \
     NPM_CONFIG_UPDATE_NOTIFIER=false \
